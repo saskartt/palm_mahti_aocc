@@ -30,8 +30,8 @@
 %compiler_name_ser   $MPIF90
 %cpp_options         -cpp -D__gfortran -D__parallel -DMPI_REAL=MPI_DOUBLE_PRECISION -DMPI_2REAL=MPI_2DOUBLE_PRECISION -D__netcdf -D__netcdf4 -D__netcdf4_parallel -D__fftw -D__rrtmg
 %make_options        -j 4
-%compiler_options    -Mfree -O3 -march=native -ffast-math -funroll-loops -I$NETCDF_FORTRAN_INSTALL_ROOT/include -I$AMDFFTW_INSTALL_ROOT/include -I$NETCDF_C_INSTALL_ROOT/include -I$PARALLEL_NETCDF_INSTALL_ROOT/include -I$HDF5_INSTALL_ROOT/include -I /scratch/project_XXXXXXX/palm/inst/rrtmg/include
-%linker_options       -L$NETCDF_FORTRAN_INSTALL_ROOT/lib -L$AMDFFTW_INSTALL_ROOT/lib -L$NETCDF_C_INSTALL_ROOT/lib -L$PARALLEL_NETCDF_INSTALL_ROOT/lib -L$HDF5_INSTALL_ROOT/lib -L/scratch/project_XXXXXXX/palm/inst/rrtmg/lib  -lnetcdff -lnetcdf -lpnetcdf -lhdf5 -lhdf5_hl -lhdf5_fortran -lfftw3 -lrrtmg
+%compiler_options    -Mfree -O3 -march=native -ffast-math -funroll-loops -I$NETCDF_FORTRAN_INSTALL_ROOT/include -I$AMDFFTW_INSTALL_ROOT/include -I$NETCDF_C_INSTALL_ROOT/include -I$PARALLEL_NETCDF_INSTALL_ROOT/include -I$HDF5_INSTALL_ROOT/include -I $PALM_ROOT/inst/rrtmg/include
+%linker_options       -L$NETCDF_FORTRAN_INSTALL_ROOT/lib -L$AMDFFTW_INSTALL_ROOT/lib -L$NETCDF_C_INSTALL_ROOT/lib -L$PARALLEL_NETCDF_INSTALL_ROOT/lib -L$HDF5_INSTALL_ROOT/lib -L$PALM_ROOT/inst/rrtmg/lib  -lnetcdff -lnetcdf -lpnetcdf -lhdf5 -lhdf5_hl -lhdf5_fortran -lfftw3 -lrrtmg
 %execute_command     srun --ntasks={{mpi_tasks}} --nodes={{nodes}} --ntasks-per-node={{tasks_per_node}} palm
 %execute_command_for_combine   srun --nodes=1 --ntasks-per-node=1  combine_plot_fields.x
 #%memory              2300

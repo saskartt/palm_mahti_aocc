@@ -26,5 +26,5 @@ This repository contains necessary scripts to compile the [PALM model system](ht
 
 ## Author
 Sasu Karttunen \
-University of Helsinki \
-<
+<sasu.karttunen@helsinki.fi> \
+University of Helsinki

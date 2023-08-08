@@ -1,0 +1,81 @@
+################################################################################
+# This is a configuration file for PALM for the CSC's Mahti supercomputer
+# using AMD Optimizing Fortran Compiler. See README.md for more info.
+# Author: Sasu Karttunen, University of Helsinki <sasu.karttunen@helsinki.fi>
+################################################################################
+#
+#-------------------------------------------------------------------------------
+# General compiler and host configuration section.
+# Variable declaration lines must start with a percent character
+# Internal variables can be used as {{VARIABLE_NAME}}. Please see documentation.
+#-------------------------------------------------------------------------------
+%base_directory      $PALM_ROOT/inst
+%base_data           $PALM_ROOT/run/JOBS
+%source_path         $PALM_ROOT/sources/packages/palm/model/src
+%user_source_path    $PALM_ROOT/run/JOBS/$run_identifier/USER_CODE
+%fast_io_catalog     $PALM_ROOT/run/tmp
+%restart_data_path   $PALM_ROOT/run/tmp
+%output_data_path    $PALM_ROOT/run/JOBS
+%local_jobcatalog    $PALM_ROOT/run/JOBS/$run_identifier/LOG_FILES
+
+#
+%local_ip            127.0.0.1
+%local_hostname      mahti-login2.mahti.csc.fi
+%local_username      $USER
+
+#%project_account     <project-account>
+%submit_command      /usr/bin/sbatch
+#
+%compiler_name       $MPIF90
+%compiler_name_ser   $MPIF90
+%cpp_options         -cpp -D__gfortran -D__parallel -DMPI_REAL=MPI_DOUBLE_PRECISION -DMPI_2REAL=MPI_2DOUBLE_PRECISION -D__netcdf -D__netcdf4 -D__netcdf4_parallel -D__fftw -D__rrtmg
+%make_options        -j 4
+%compiler_options    -Mfree -O3 -march=native -ffast-math -funroll-loops -I$NETCDF_FORTRAN_INSTALL_ROOT/include -I$AMDFFTW_INSTALL_ROOT/include -I$NETCDF_C_INSTALL_ROOT/include -I$PARALLEL_NETCDF_INSTALL_ROOT/include -I$HDF5_INSTALL_ROOT/include -I /scratch/project_XXXXXXX/palm/inst/rrtmg/include
+%linker_options       -L$NETCDF_FORTRAN_INSTALL_ROOT/lib -L$AMDFFTW_INSTALL_ROOT/lib -L$NETCDF_C_INSTALL_ROOT/lib -L$PARALLEL_NETCDF_INSTALL_ROOT/lib -L$HDF5_INSTALL_ROOT/lib -L/scratch/project_XXXXXXX/palm/inst/rrtmg/lib  -lnetcdff -lnetcdf -lpnetcdf -lhdf5 -lhdf5_hl -lhdf5_fortran -lfftw3 -lrrtmg
+%execute_command     srun --ntasks={{mpi_tasks}} --nodes={{nodes}} --ntasks-per-node={{tasks_per_node}} palm
+%execute_command_for_combine   srun --nodes=1 --ntasks-per-node=1  combine_plot_fields.x
+#%memory              2300
+module_commands      module purge; module load aocc/3.2.0; module load mpich/4.0.1; module load netcdf-c/4.8.1; module load netcdf-fortran/4.5.3; module load parallel-netcdf/1.12.2; module load hdf5/1.10.7-mpi; module load amdfftw/3.1; module load cmake/3.21.4
+#
+#%login_init_cmd      .execute_special_profile
+#
+#-------------------------------------------------------------------------------
+# Directives to be used for batch jobs
+# Lines must start with "BD:". If $-characters are required, hide them with \
+# Internal variables can be used as {{variable_name}}. Please see documentation.
+#-------------------------------------------------------------------------------
+BD:#!/bin/bash -l
+BD:#SBATCH --job-name={{job_id}}
+BD:#SBATCH --error=%J_err_{{job_id}}
+BD:#SBATCH --output=%J_out_{{job_id}}
+BD:#SBATCH --nodes={{nodes}}
+BD:#SBATCH --ntasks={{mpi_tasks}}
+BD:#SBATCH --ntasks-per-node={{tasks_per_node}}
+BD:#SBATCH --cpus-per-task=1
+BD:#SBATCH --time={{cpu_hours}}:{{cpu_minutes}}:{{cpu_seconds}}
+BD:#SBATCH --partition={{queue}}
+BD:#SBATCH --account=$CSC_PROJECT
+#
+#-------------------------------------------------------------------------------
+# INPUT-commands. These commands are executed before running PALM
+# Lines must start with "IC:"
+#-------------------------------------------------------------------------------
+IC:ulimit  -s unlimited
+#
+#-------------------------------------------------------------------------------
+# ERROR-commands. These commands are executed when PALM terminates abnormally
+# Lines must start with "EC:"
+#-------------------------------------------------------------------------------
+EC:[[ $locat = execution ]]  &&  cat  RUN_CONTROL
+#
+#-------------------------------------------------------------------------------
+# OUTPUT-commands. These commands are executed when PALM terminates normally
+# Lines must start with "OC:"
+#-------------------------------------------------------------------------------
+#
+# Combine 1D- and 3D-profile output (these files are not usable for plotting)
+OC:[[ -f LIST_PROFIL_1D     ]]  &&  cat  LIST_PROFIL_1D  >>  LIST_PROFILE
+OC:[[ -f LIST_PROFIL        ]]  &&  cat  LIST_PROFIL     >>  LIST_PROFILE
+#
+# Combine all particle information files
+OC:[[ -f PARTICLE_INFOS/_0000 ]]  &&  cat  PARTICLE_INFOS/* >> PARTICLE_INFO

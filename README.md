@@ -11,16 +11,16 @@ This repository contains necessary scripts to compile the [PALM model system](ht
 6. Move to the source directory `cd $PALM_ROOT/sources/`.
 7. Replace the `install` script in the source directory with the one from this repository. This adds `srun` as an alternative dependency for `mpirun`.
 8. Compile auxillary programs by running `bash install -p ../inst`. Compilation of the actual PALM sources fails at this stage due to incorrect compiler configuration, but you may ignore this.
-9. Create a run directory `mkdir $PALM_DIR/run/` and `cd $PALM_DIR/run/` into it.
+9. Create a run directory `mkdir $PALM_ROOT/run/` and `cd $PALM_ROOT/run/` into it.
 10. Copy the configuration file `palm.config.mahti-aocc` from this repository into the run directory as `$PALM_ROOT/run/.palm.config.mahti-aocc`. Notice the dot in the front, i.e. this should be a hidden file.
-11. Test building the PALM sources by running  `palmbuild -c mahti-aocc` at `$PALM_DIR/run/`.
+11. Test building the PALM sources by running  `palmbuild -c mahti-aocc` at `$PALM_ROOT/run/`.
 12. If everything OK, you can continue to running PALM jobs.
 
 ## Running jobs
 
-1. Move necessary inputs to a respective job directory (`$PALM_DIR/run/JOBS/$run_identifier/`)
+1. Move necessary inputs to a respective job directory (`$PALM_ROOT/run/JOBS/$run_identifier/`)
 2. Source the environment using `source $HOME/env_palm_mahti_aocc`
-4. `cd` into the run directory `$PALM_DIR/run/`
+4. `cd` into the run directory `$PALM_ROOT/run/`
 5. Test compilation and batch job file creation using `palmrun` with the option `-F`, e.g. `palmrun -b -r example_cbl -a "d3#" -c "mahti-aocc" -X "4" -T "4" -q test -m 1000 -t 500 -F`
 5. If everything OK, run `palmrun` again without the option `-F`
 
